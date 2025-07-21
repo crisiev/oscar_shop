@@ -1,12 +1,14 @@
 from pathlib import Path
-from oscar.defaults import *  # Debe ir aquí, ANTES de INSTALLED_APPS
+from oscar.defaults import *  # Importar Oscar antes de INSTALLED_APPS
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'cambia-esto-por-tu-clave-secreta'
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = '1234'
+
+DEBUG = True  # Cambia a False en producción
+
+ALLOWED_HOSTS = ['oscar-shop-3.onrender.com', 'localhost', '127.0.0.1']
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -19,7 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
 
-    # Oscar apps
+    # Apps de Oscar
     'oscar.config.Shop',
     'oscar.apps.analytics.apps.AnalyticsConfig',
     'oscar.apps.checkout.apps.CheckoutConfig',
@@ -86,8 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                # Contextos de Oscar
+                # Context processors de Oscar
                 'oscar.apps.search.context_processors.search_form',
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.communication.notifications.context_processors.notifications',
@@ -99,44 +100,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
-# Base de datos
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'oscarshoppost',
+        'USER': 'oscarshoppost_user',
+        'PASSWORD': 'DBSxnQH6vucoWGE31KaECCIVgu8MKs1y',
+        'HOST': 'dpg-d1v7vak9c44c73dktk30-a.oregon-postgres.render.com',
+        'PORT': '5432',
     }
 }
 
-# Autenticación
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# Internacionalización
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Archivos estáticos y media
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Nombre de tienda y tagline
 OSCAR_SHOP_NAME = 'Mi Tienda Oscar'
 OSCAR_SHOP_TAGLINE = 'E‑commerce con elegancia'
 
-# Búsqueda (simple para empezar)
 HAYSTACK_CONNECTIONS = {
     'default': {'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'}
 }
 
-# ✅ Clave importante para modelos nuevos
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅ Si quieres forzar una moneda específica
 OSCAR_DEFAULT_CURRENCY = 'USD'
