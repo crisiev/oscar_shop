@@ -1,16 +1,15 @@
+import os
 from pathlib import Path
 from oscar.defaults import *  # Importar Oscar antes de INSTALLED_APPS
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = '1234'
+SECRET_KEY = '1234'  # Clave fija para que arranque sin drama
 
-DEBUG = True  # Cambia a False en producción
+DEBUG = True  # Para que veas errores mientras pruebas
 
 ALLOWED_HOSTS = ['oscar-shop-3.onrender.com', 'localhost', '127.0.0.1']
 
-# Aplicaciones instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
