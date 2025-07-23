@@ -1,20 +1,20 @@
 services:
   - type: web
     name: oscar-shop
-    runtime: python
+    env: python
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: gunicorn oscar_shop.wsgi:application
+    startCommand: python manage.py migrate --noinput && gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: oscar_shop.settings
-      - key: PYTHON_VERSION
-        value: 3.11
       - key: SECRET_KEY
         value: 1234
       - key: DEBUG
-        value: "False"
+        value: "True"  # Cambia a "False" cuando ya estés en producción, mi reina
       - key: ALLOWED_HOSTS
-        value: "oscar-shop-3.onrender.com"
+        value: "oscar-shop-3.onrender.com,localhost,127.0.0.1"
+      - key: DATABASE_URL
+        value: "postgres://oscarshoppost_user:DBSxnQH6vucoWGE31KaECCIVgu8MKs1y@dpg-d1v7vak9c44c73dktk30-a.oregon-postgres.render.com:5432/oscarshoppost"
+      - key: PYTHON_VERSION
+        value: "3.11"
