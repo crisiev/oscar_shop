@@ -1,14 +1,19 @@
 import os
 from pathlib import Path
-from oscar.defaults import *  # Importar Oscar antes de INSTALLED_APPS
+from oscar.defaults import *
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = '1234'  # Clave fija para que arranque sin drama
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '1234')
 
-DEBUG = True  # Para que veas errores mientras pruebas
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['oscar-shop-3.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'oscar-shop-3.onrender.com',
+    'localhost',
+    '127.0.0.1'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,39 +25,39 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
 
-    # Apps de Oscar
+    # Oscar apps
     'oscar.config.Shop',
-    'oscar.apps.analytics.apps.AnalyticsConfig',
-    'oscar.apps.checkout.apps.CheckoutConfig',
-    'oscar.apps.address.apps.AddressConfig',
-    'oscar.apps.shipping.apps.ShippingConfig',
-    'oscar.apps.catalogue.apps.CatalogueConfig',
-    'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
-    'oscar.apps.communication.apps.CommunicationConfig',
-    'oscar.apps.partner.apps.PartnerConfig',
-    'oscar.apps.basket.apps.BasketConfig',
-    'oscar.apps.payment.apps.PaymentConfig',
-    'oscar.apps.offer.apps.OfferConfig',
-    'oscar.apps.order.apps.OrderConfig',
-    'oscar.apps.customer.apps.CustomerConfig',
-    'oscar.apps.search.apps.SearchConfig',
-    'oscar.apps.voucher.apps.VoucherConfig',
-    'oscar.apps.wishlists.apps.WishlistsConfig',
-    'oscar.apps.dashboard.apps.DashboardConfig',
-    'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
-    'oscar.apps.dashboard.users.apps.UsersDashboardConfig',
-    'oscar.apps.dashboard.orders.apps.OrdersDashboardConfig',
-    'oscar.apps.dashboard.catalogue.apps.CatalogueDashboardConfig',
-    'oscar.apps.dashboard.offers.apps.OffersDashboardConfig',
-    'oscar.apps.dashboard.partners.apps.PartnersDashboardConfig',
-    'oscar.apps.dashboard.pages.apps.PagesDashboardConfig',
-    'oscar.apps.dashboard.ranges.apps.RangesDashboardConfig',
-    'oscar.apps.dashboard.reviews.apps.ReviewsDashboardConfig',
-    'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
-    'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
-    'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
+    'oscar.apps.analytics',
+    'oscar.apps.checkout',
+    'oscar.apps.address',
+    'oscar.apps.shipping',
+    'oscar.apps.catalogue',
+    'oscar.apps.catalogue.reviews',
+    'oscar.apps.communication',
+    'oscar.apps.partner',
+    'oscar.apps.basket',
+    'oscar.apps.payment',
+    'oscar.apps.offer',
+    'oscar.apps.order',
+    'oscar.apps.customer',
+    'oscar.apps.search',
+    'oscar.apps.voucher',
+    'oscar.apps.wishlists',
+    'oscar.apps.dashboard',
+    'oscar.apps.dashboard.reports',
+    'oscar.apps.dashboard.users',
+    'oscar.apps.dashboard.orders',
+    'oscar.apps.dashboard.catalogue',
+    'oscar.apps.dashboard.offers',
+    'oscar.apps.dashboard.partners',
+    'oscar.apps.dashboard.pages',
+    'oscar.apps.dashboard.ranges',
+    'oscar.apps.dashboard.reviews',
+    'oscar.apps.dashboard.vouchers',
+    'oscar.apps.dashboard.communications',
+    'oscar.apps.dashboard.shipping',
 
-    # Dependencias externas
+    # Externas
     'widget_tweaks',
     'haystack',
     'treebeard',
@@ -64,6 +69,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,7 +93,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # Context processors de Oscar
                 'oscar.apps.search.context_processors.search_form',
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.communication.notifications.context_processors.notifications',
@@ -99,16 +104,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'oscarshoppost',
-        'USER': 'oscarshoppost_user',
-        'PASSWORD': 'DBSxnQH6vucoWGE31KaECCIVgu8MKs1y',
-        'HOST': 'dpg-d1v7vak9c44c73dktk30-a.oregon-postgres.render.com',
-        'PORT': '5432',
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
@@ -122,6 +129,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -20,4 +20,8 @@ sorl-thumbnail==12.11.0
 sqlparse==0.5.3
 tzdata==2025.2
 psycopg2-binary>=2.9
-
+whitenoise
+dj-database-url
+python-dotenv
+pillow
+treebeard

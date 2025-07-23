@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: oscar-shop
+    runtime: python
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn oscar_shop.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: oscar_shop.settings
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: SECRET_KEY
+        value: 1234
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "oscar-shop-3.onrender.com"
