@@ -1,22 +1,17 @@
 import os
 from pathlib import Path
-from oscar.defaults import *
 import dj_database_url
 
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clave fija por ahora, sin rollos de seguridad extras para que arranque sin drama
-SECRET_KEY = '1234'
+# Seguridad y debug
+SECRET_KEY = os.getenv("SECRET_KEY", "1234")  # Por ahora fijo el "1234" que quieres
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# Debug activado para pruebas, desactiva en producción cuando estés lista
-DEBUG = True
+ALLOWED_HOSTS = ["*"]  # Para desarrollo y despliegue en Render
 
-ALLOWED_HOSTS = [
-    'oscar-shop-3.onrender.com',
-    'localhost',
-    '127.0.0.1',
-]
-
+# Aplicaciones instaladas (sin duplicados)
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,62 +19,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'django.contrib.flatpages',
 
-    # Apps Oscar sin duplicados para evitar error 'catalogue' duplicado
-    'oscar.config.Shop',
-    'oscar.apps.analytics',
-    'oscar.apps.checkout',
-    'oscar.apps.address',
-    'oscar.apps.shipping',
-    'oscar.apps.catalogue',
-    'oscar.apps.catalogue.reviews',
-    'oscar.apps.communication',
-    'oscar.apps.partner',
-    'oscar.apps.basket',
-    'oscar.apps.payment',
-    'oscar.apps.offer',
-    'oscar.apps.order',
-    'oscar.apps.customer',
-    'oscar.apps.search',
-    'oscar.apps.voucher',
-    'oscar.apps.wishlists',
-    'oscar.apps.dashboard',
-    'oscar.apps.dashboard.reports',
-    'oscar.apps.dashboard.users',
-    'oscar.apps.dashboard.orders',
-    'oscar.apps.dashboard.catalogue',
-    'oscar.apps.dashboard.offers',
-    'oscar.apps.dashboard.partners',
-    'oscar.apps.dashboard.pages',
-    'oscar.apps.dashboard.ranges',
-    'oscar.apps.dashboard.reviews',
-    'oscar.apps.dashboard.vouchers',
-    'oscar.apps.dashboard.communications',
-    'oscar.apps.dashboard.shipping',
-
-    # Dependencias externas
-    'widget_tweaks',
-    'haystack',
-    'treebeard',
-    'sorl.thumbnail',
+    # Apps externas que usas
+    'django_oscar',
+    'catalogue',   # Revisa que solo tengas una carpeta app llamada exactamente así para evitar duplicados
     'django_tables2',
-]
+    'django_phonenumber_field',
+    'django_treebeard',
+    'django_widget_tweaks',
+    'django_haystack',
+    'django_extra_views',
 
-SITE_ID = 1
+    # Otros si tienes más, agrega aquí
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir static en prod
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Sirve estático en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'oscar.apps.basket.middleware.BasketMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
 ROOT_URLCONF = 'oscar_shop.urls'
@@ -87,7 +49,7 @@ ROOT_URLCONF = 'oscar_shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # carpeta de templates local
+        'DIRS': [BASE_DIR / 'templates'],  # Ajusta si tienes carpeta templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -95,10 +57,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'oscar.apps.search.context_processors.search_form',
-                'oscar.apps.checkout.context_processors.checkout',
-                'oscar.apps.communication.notifications.context_processors.notifications',
-                'oscar.core.context_processors.metadata',
             ],
         },
     },
@@ -106,44 +64,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
-# Configuración de base de datos con dj_database_url para usar URL o fallback a sqlite3 local
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# Base de datos, configurada para PostgreSQL y variables de entorno
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"postgres://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+}
 
-AUTHENTICATION_BACKENDS = (
-    'oscar.apps.customer.auth_backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
-)
+# Password validation (puedes ajustar o dejar como está)
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
+# Internacionalización
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise para servir estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-OSCAR_SHOP_NAME = 'Mi Tienda Oscar'
-OSCAR_SHOP_TAGLINE = 'E‑commerce con elegancia'
-
-HAYSTACK_CONNECTIONS = {
-    'default': {'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'}
-}
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-OSCAR_DEFAULT_CURRENCY = 'USD'

@@ -2,15 +2,24 @@ services:
   - type: web
     name: oscar-shop
     env: python
-    buildCommand: |
-      poetry install --no-root
-      poetry run python manage.py collectstatic --noinput
-      poetry run python manage.py migrate --noinput
-    startCommand: "poetry run gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:8000"
+    pythonVersion: "3.13"
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
+      - key: DB_HOST
+        value: dpg-d1v7vak9c44c73dktk30-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        value: oscarshoppost
+      - key: DB_USER
+        value: oscarshoppost_user
+      - key: DB_PASSWORD
+        value: DBSxnQH6vucoWGE31KaECCIVgu8MKs1y
+      - key: DEBUG
+        value: "True"
       - key: SECRET_KEY
         value: "1234"
-      - key: DEBUG
-        value: "False"
-      - key: DJANGO_ALLOWED_HOSTS
-        value: "oscar-shop.onrender.com"
+    disk:
+      sizeGb: 1
+    plan: starter
