@@ -1,20 +1,22 @@
 import os
 from pathlib import Path
 from oscar.defaults import *
-import dj_database_url  # Para configurar la DB desde URL en producción
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clave secreta fija para desarrollo y pruebas. Cambia esto en producción, mi amor.
-SECRET_KEY = os.getenv('SECRET_KEY', '1234')
+# Clave fija por ahora, sin rollos de seguridad extras para que arranque sin drama
+SECRET_KEY = '1234'
 
-# DEBUG activado por defecto para que puedas ver errores mientras pruebas
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+# Debug activado para pruebas, desactiva en producción cuando estés lista
+DEBUG = True
 
-# Hosts permitidos para evitar problemas de seguridad, aquí tu dominio de Render y localhost
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oscar-shop-3.onrender.com,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    'oscar-shop-3.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
-# Aplicaciones instaladas, Oscar con todo su esplendor + dependencias externas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
 
-    # Oscar apps
+    # Apps Oscar sin duplicados para evitar error 'catalogue' duplicado
     'oscar.config.Shop',
     'oscar.apps.analytics',
     'oscar.apps.checkout',
@@ -57,7 +59,7 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.communications',
     'oscar.apps.dashboard.shipping',
 
-    # Externas
+    # Dependencias externas
     'widget_tweaks',
     'haystack',
     'treebeard',
@@ -67,10 +69,9 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
-# Middleware, con WhiteNoise para servir estáticos en producción sin líos
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para manejar estáticos en producción
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir static en prod
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -83,20 +84,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'oscar_shop.urls'
 
-# Templates con los context processors que Oscar necesita
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],  # carpeta de templates local
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',  # Muy importante para Oscar
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                # Context processors específicos de Oscar
                 'oscar.apps.search.context_processors.search_form',
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.communication.notifications.context_processors.notifications',
@@ -108,15 +106,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
-# Configuración de base de datos:
-# Si tienes DATABASE_URL (Render la provee), úsala para configurar postgres
+# Configuración de base de datos con dj_database_url para usar URL o fallback a sqlite3 local
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # Si no, usa SQLite para desarrollo local tranquilo
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -124,40 +120,30 @@ else:
         }
     }
 
-# Backends de autenticación (Email + default)
 AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# Internacionalización básica
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Configuración de archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Usa WhiteNoise para servir archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Archivos media (subidos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Datos Oscar muy básicos y personalizables después
 OSCAR_SHOP_NAME = 'Mi Tienda Oscar'
 OSCAR_SHOP_TAGLINE = 'E‑commerce con elegancia'
 
-# Buscador simple para pruebas
 HAYSTACK_CONNECTIONS = {
     'default': {'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'}
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Moneda default para Oscar
 OSCAR_DEFAULT_CURRENCY = 'USD'
-

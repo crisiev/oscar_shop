@@ -3,18 +3,14 @@ services:
     name: oscar-shop
     env: python
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate --noinput && gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:$PORT
+      poetry install --no-root
+      poetry run python manage.py collectstatic --noinput
+      poetry run python manage.py migrate --noinput
+    startCommand: "poetry run gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:8000"
     envVars:
       - key: SECRET_KEY
-        value: 1234
+        value: "1234"
       - key: DEBUG
-        value: "True"  # Cambia a "False" cuando ya estés en producción, mi reina
-      - key: ALLOWED_HOSTS
-        value: "oscar-shop-3.onrender.com,localhost,127.0.0.1"
-      - key: DATABASE_URL
-        value: "postgres://oscarshoppost_user:DBSxnQH6vucoWGE31KaECCIVgu8MKs1y@dpg-d1v7vak9c44c73dktk30-a.oregon-postgres.render.com:5432/oscarshoppost"
-      - key: PYTHON_VERSION
-        value: "3.11"
+        value: "False"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "oscar-shop.onrender.com"
