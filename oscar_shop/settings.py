@@ -2,16 +2,15 @@ import os
 from pathlib import Path
 import dj_database_url
 
-# Base directory
+# Base directory del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Seguridad y debug
-SECRET_KEY = os.getenv("SECRET_KEY", "1234")  # Por ahora fijo el "1234" que quieres
+SECRET_KEY = os.getenv("SECRET_KEY", "1234")
 DEBUG = os.getenv("DEBUG", "True") == "True"
+ALLOWED_HOSTS = ["*"]  # Ajusta para producción si quieres
 
-ALLOWED_HOSTS = ["*"]  # Para desarrollo y despliegue en Render
-
-# Aplicaciones instaladas (sin duplicados)
+# Aplicaciones instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,22 +19,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Apps externas que usas
+    # Tus apps y terceros
     'django_oscar',
-    'catalogue',   # Revisa que solo tengas una carpeta app llamada exactamente así para evitar duplicados
+    'catalogue',
     'django_tables2',
     'django_phonenumber_field',
     'django_treebeard',
     'django_widget_tweaks',
     'django_haystack',
     'django_extra_views',
-
-    # Otros si tienes más, agrega aquí
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Sirve estático en producción
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Sirve estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,27 +62,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
-# Base de datos, configurada para PostgreSQL y variables de entorno
+# Configuración base de datos PostgreSQL desde variables de entorno
 DATABASES = {
     'default': dj_database_url.config(
         default=f"postgres://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
     )
 }
 
-# Password validation (puedes ajustar o dejar como está)
+# Validaciones de contraseña (puedes ajustar o dejar)
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 # Internacionalización
@@ -97,7 +87,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise para servir estáticos en producción
+# WhiteNoise para archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Campo automático por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
