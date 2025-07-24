@@ -64,9 +64,7 @@ WSGI_APPLICATION = 'oscar_shop.wsgi.application'
 
 # Configuración base de datos PostgreSQL desde variables de entorno
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"postgres://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    )
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
 # Validaciones de contraseña (puedes ajustar o dejar)
