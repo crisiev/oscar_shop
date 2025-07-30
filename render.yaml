@@ -2,8 +2,13 @@ services:
   - type: web
     name: oscar-shop
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn oscar_shop.wsgi --bind 0.0.0.0:$PORT
+    pythonVersion: "3.11"
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py migrate --noinput
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: SECRET_KEY
         value: "1234"
@@ -19,5 +24,6 @@ services:
         value: "5432"
       - key: DB_NAME
         value: "oscarshoppost"
-
-staticPublishPath: staticfiles
+      - key: ALLOWED_HOSTS
+        value: "oscar-shop-3.onrender.com"
+    staticPublishPath: staticfiles
