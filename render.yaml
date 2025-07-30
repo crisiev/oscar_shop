@@ -9,8 +9,6 @@ services:
       python manage.py collectstatic --noinput
     startCommand: gunicorn oscar_shop.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11.8"  # <- este campo sí lo reconoce Render
       - key: SECRET_KEY
         value: "1234"
       - key: DEBUG
@@ -27,4 +25,3 @@ services:
         value: "oscarshoppost"
       - key: ALLOWED_HOSTS
         value: "oscar-shop-3.onrender.com"
-    staticPublishPath: staticfiles
