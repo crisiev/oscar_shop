@@ -74,6 +74,33 @@ OSCAR_OFFERS_INCL_TAX = os.getenv("OSCAR_OFFERS_INCL_TAX", "False") == "True"
 OSCAR_ALLOW_ANON_CHECKOUT = os.getenv("OSCAR_ALLOW_ANON_CHECKOUT", "True") == "True"
 OSCAR_REQUIRED_ADDRESS_FIELDS = ("first_name", "last_name", "line1", "line4", "postcode", "country")
 
+OSCAR_DASHBOARD_CATALOGUE_FORMS = {
+    'category': 'oscar.apps.dashboard.catalogue.forms.CategoryForm',
+}
+
+# Slugs
+OSCAR_SLUG_FUNCTION = 'django.utils.text.slugify'
+OSCAR_SLUG_MAP = {}
+OSCAR_SLUG_BLACKLIST = []
+OSCAR_SLUG_ALLOW_UNICODE = False
+
+# Imagenes y thumbnails
+OSCAR_DELETE_IMAGE_FILES = False  # o True, según prefieras
+OSCAR_MISSING_IMAGE_URL = None
+OSCAR_THUMBNAILER = None
+OSCAR_THUMBNAIL_DEBUG = False
+
+# Ofertas
+OSCAR_OFFER_ROUNDING_FUNCTION = None
+OSCAR_OFFERS_IMPLEMENTED_TYPES = None
+
+# Generales
+OSCAR_STATIC_BASE_URL = None
+OSCAR_URL_SCHEMA = 'http'
+OSCAR_FROM_EMAIL = 'oscar@example.com'
+OSCAR_GOOGLE_ANALYTICS_ID = ''
+OSCAR_CSV_INCLUDE_BOM = False
+
 OSCAR_PRODUCTS_PER_PAGE = int(os.getenv("OSCAR_PRODUCTS_PER_PAGE", 20))
 OSCAR_OFFERS_PER_PAGE = int(os.getenv("OSCAR_OFFERS_PER_PAGE", 20))
 OSCAR_REVIEWS_PER_PAGE = int(os.getenv("OSCAR_REVIEWS_PER_PAGE", 20))
@@ -151,6 +178,7 @@ OSCAR_DELETE_IMAGE_FILES = None
 OSCAR_EAGER_ALERTS = True
 OSCAR_SEND_REGISTRATION_EMAIL = True
 OSCAR_STATIC_BASE_URL = None
+OSCAR_SLUG_FUNCTION = 'django.utils.text.slugify'
 
 
 
@@ -241,9 +269,6 @@ SITE_ID = 1
 
 # Logging, email y otros configs aquí según necesidad
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-
-
 
 OSCAR_DASHBOARD_NAVIGATION = [
     {
